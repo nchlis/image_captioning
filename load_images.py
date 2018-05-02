@@ -21,8 +21,8 @@ from keras.applications.resnet50 import preprocess_input, decode_predictions, Re
 #from keras.applications.vgg16 import VGG16
 
 #%% load and encode each image on-the-fly
-img_folder = './Flicker8k_Dataset'
-#img_folder = './Flicker8k_Dataset_small'
+img_folder = './Flickr8k_Dataset'
+#img_folder = './Flickr8k_Dataset_small'
 target_height = 224
 target_width = 224
 model = ResNet50(weights='imagenet',include_top=False)
