@@ -53,5 +53,5 @@ for f in img_filenames:
     #plt.imshow(x[0,:,:,:])
 
 #%%
-np.save('Flicker8k_images_encoded.npy',X_enc,allow_pickle=False)
-np.save('Flicker8k_images_filenames.npy',img_filenames,allow_pickle=False)
+np.save('Flickr8k_images_encoded.npy',X_enc,allow_pickle=False)
+np.save('Flickr8k_images_filenames.npy',img_filenames,allow_pickle=False)

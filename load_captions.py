@@ -16,7 +16,8 @@ import string
 
 #%% load all captions from a .txt file
 
-filename = './Flickr8k_text/Flickr8k.token.txt'
+#filename = './Flickr8k_text/Flickr8k.token.txt'
+filename = './Flickr8k_text/Flickr8k.token_clean.txt'#removed image 2258277193_586949ec62.jpg that doesn't exist in data folder
 #read file containing the descriptions
 file = open(filename, 'r')
 text = file.read()#entire file read as one string 
@@ -77,7 +78,7 @@ for v in captions[example_img]:
     print(v)
 
 #%% save the dictionary using numpy
-np.save("captions.npy", captions, allow_pickle = True)
+#np.save("captions.npy", captions, allow_pickle = True)
 
 #%% sanity check: load saved captions and compare
 captions2 = np.load('captions.npy').item()#.item() necessary for structured array
