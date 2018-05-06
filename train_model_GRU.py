@@ -20,7 +20,7 @@ from keras.applications.resnet50 import preprocess_input, decode_predictions, Re
 from keras.models import Model, load_model
 from keras.layers import Input, Embedding, Dense, Activation, LSTM, GRU, Dropout
 from keras.layers.merge import concatenate
-from keras.callbacks import CSVLogger, ModelCheckpoint
+from keras.callbacks import CSVLogger, ModelCheckpoint, EarlyStopping
 from keras.preprocessing.sequence import pad_sequences
 from keras.utils import to_categorical, plot_model
 
@@ -105,9 +105,8 @@ def data_generator(input_filenames=None):
 nembedding = 128
 ndense = 128
 nlstm = 128
-#dropout_rate=0.0
+dropout_rate=0.0
 #dropout_rate=0.25
-dropout_rate=0.1
 # feature extractor model
 input_img = Input(shape=(2048,))
 x_img = Dropout(dropout_rate)(input_img)
@@ -143,7 +142,7 @@ filenames_val = np.array(filenames_val.values.tolist())#convert to array with dt
 gen_val = data_generator(input_filenames=filenames_val)
 steps_per_epoch_val = len(filenames_val)
 
-filepath='model128_GRU_dropout'+str(dropout_rate) #to save the weights
+filepath='./saved_models/model128_GRU_dropout'+str(dropout_rate) #to save the weights
 #save model architecture as a .png file
 plot_model(model, to_file=filepath+'.png', show_shapes=True)
 #save tokenizer to use on new datasets
@@ -155,12 +154,13 @@ with open(filepath+'_tokenizer.pkl', 'wb') as handle:
 
 checkpoint = ModelCheckpoint(filepath+'.hdf5', monitor='val_loss', verbose=1, save_best_only=True, mode='auto')
 csvlog = CSVLogger(filepath+'_train_log.csv',append=True)
+early_stopping = EarlyStopping(monitor='val_loss', min_delta=0, patience=5)
 
 tic=time.time()
 model.fit_generator(generator=gen_train,steps_per_epoch=steps_per_epoch_tr,
                     validation_data=gen_val,validation_steps=steps_per_epoch_val,
-                 epochs=20, verbose=2,
-                 initial_epoch=0,callbacks=[checkpoint, csvlog])
+                 epochs=10, verbose=2,
+                 initial_epoch=0,callbacks=[checkpoint, csvlog, early_stopping])
 toc=time.time()
 model.save(filepath+'_model.hdf5')
 file = open(filepath+'_time.txt','w')
