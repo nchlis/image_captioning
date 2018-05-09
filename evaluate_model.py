@@ -120,7 +120,8 @@ def evaluate_model(model, filenames_eval, images, tokenizer, max_caption_length)
 filenames_ts = pd.read_csv('./Flickr8k_text/Flickr_8k.testImages.txt',header=None)
 filenames_ts = np.array(filenames_ts.values.tolist())#convert to array with dtype='<U25'
 
-model_filenames = ['model128_LSTM_dropout0.0','model128_LSTM_dropout0.0']
+model_filenames = ['model128_LSTM_dropout0.0','model128_LSTM_dropout0.1','model128_LSTM_dropout0.25',
+                   'model128_GRU_dropout0.0','model128_GRU_dropout0.1','model128_GRU_dropout0.25']
 for mfname in model_filenames:
     clear_session()#to avoid keras breakdown
     print('Loading',mfname)
@@ -140,9 +141,25 @@ for mfname in model_filenames:
     evaluate_model(model,filenames_ts,images,tokenizer,max_caption_length)
 
 #%% Bonus: generate caption for a selected flickr image
-bonus = False
+bonus = True
+mfname = 'model128_GRU_dropout0.25'#the best model of the 6 tested above
 if bonus == True:
-    ix=6
+    clear_session()#to avoid keras breakdown
+    print('Loading',mfname)
+    
+    #load the tokenizer
+    with open('./saved_models/'+mfname+'_tokenizer.pkl', 'rb') as handle:
+        tokenizer = pickle.load(handle)
+    tokenizer.oov_token = None #attribute lost during serialization
+    vocab_size = len(tokenizer.word_index.keys())+1
+    print('Vocabulary size after tokenizer:',vocab_size,'unique words.')
+    
+    #load model and perform sanity checks
+    model=load_model('./saved_models/'+mfname+'.hdf5')
+    assert model.input_layers[1].input_shape[1] == max_caption_length
+    assert model.output_layers[0].output_shape[1] == vocab_size
+    #%% plot the image
+    ix=6#6,12,14,18, 72#fail: 54, 73, 74, semi-fail:55, 59, 64, 76
     target_height = 224
     target_width = 224
     img_folder = './Flickr8k_Dataset'

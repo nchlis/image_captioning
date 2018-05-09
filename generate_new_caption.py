@@ -93,7 +93,7 @@ def generate_caption(img, model, tokenizer, max_caption_length):
 #%% change these parameters as you see fit
 img_folder = './new_images'#folder containing the images to caption
 save_folder = './captioned_images'#where to save captioned images, make sure to create this folder before running the script
-captioning_model = './saved_models/model128_LSTM_dropout0.0.hdf5'#keras model
+captioning_model = './saved_models/model128_GRU_dropout0.25.hdf5'#keras model
 
 #%% read all images in the folder, generate captions and save them
 
@@ -103,7 +103,7 @@ img_filenames = np.array(img_filenames)
 N = len(img_filenames)#number of total images
 
 #load the tokenizer
-with open('./saved_models/model128_LSTM_dropout0.0_tokenizer.pkl', 'rb') as handle:
+with open('./saved_models/model128_GRU_dropout0.25_tokenizer.pkl', 'rb') as handle:
     tokenizer = pickle.load(handle)
 tokenizer.oov_token = None #attribute lost during serialization
 vocab_size = len(tokenizer.word_index.keys())+1
