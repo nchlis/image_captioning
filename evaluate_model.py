@@ -5,33 +5,13 @@ Created on Tue May  8 11:03:08 2018
 @author: N.Chlis
 """
 
-import os
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-from scipy.io import loadmat
-from skimage.transform import rescale, resize, downscale_local_mean
-from lmfit.models import GaussianModel, ConstantModel
-from keras.preprocessing import image
-#from keras.applications.imagenet_utils import preprocess_input
-from keras.applications.resnet50 import preprocess_input, decode_predictions, ResNet50
-
-from keras.models import Model, load_model
-from keras.layers import Input, Embedding, Dense, Activation, LSTM, GRU, Dropout
-from keras.layers.merge import concatenate
-from keras.callbacks import CSVLogger, ModelCheckpoint, EarlyStopping
 from keras.preprocessing.sequence import pad_sequences
-from keras.utils import to_categorical, plot_model
-
-from sklearn.model_selection import train_test_split
-import random
-import sys
-import time
-from keras.preprocessing.text import Tokenizer#map words to integers
 from keras.backend import clear_session
-#clear_session();print('Cleared Keras session to load new model')
 import pickle
 from nltk.translate.bleu_score import corpus_bleu #BLEU score
+from keras.models import load_model
 
 #%% load the data
 filenames = np.load('Flickr8k_images_filenames.npy')#8091 filenames
@@ -116,12 +96,14 @@ def evaluate_model(model, filenames_eval, images, tokenizer, max_caption_length)
     print('BLEU-3: %f' % corpus_bleu(actual, predicted, weights=(0.3, 0.3, 0.3, 0)))
     print('BLEU-4: %f' % corpus_bleu(actual, predicted, weights=(0.25, 0.25, 0.25, 0.25)))
 
-#%%
+#%% evaluate the models
 filenames_ts = pd.read_csv('./Flickr8k_text/Flickr_8k.testImages.txt',header=None)
 filenames_ts = np.array(filenames_ts.values.tolist())#convert to array with dtype='<U25'
 
 model_filenames = ['model128_LSTM_dropout0.0','model128_LSTM_dropout0.1','model128_LSTM_dropout0.25',
-                   'model128_GRU_dropout0.0','model128_GRU_dropout0.1','model128_GRU_dropout0.25']
+                   'model128_GRU_dropout0.0','model128_GRU_dropout0.1','model128_GRU_dropout0.25'
+                   'model128_LSTM_inject_dropout0.0','model128_LSTM_inject_dropout0.1','model128_LSTM_inject_dropout0.25',
+                   'model128_GRU_inject_dropout0.0','model128_GRU_inject_dropout0.1','model128_GRU_inject_dropout0.25']
 for mfname in model_filenames:
     clear_session()#to avoid keras breakdown
     print('Loading',mfname)
@@ -139,49 +121,4 @@ for mfname in model_filenames:
     assert model.output_layers[0].output_shape[1] == vocab_size
     
     evaluate_model(model,filenames_ts,images,tokenizer,max_caption_length)
-
-#%% Bonus: generate caption for a selected flickr image
-bonus = True
-mfname = 'model128_GRU_dropout0.25'#the best model of the 6 tested above
-if bonus == True:
-    clear_session()#to avoid keras breakdown
-    print('Loading',mfname)
-    
-    #load the tokenizer
-    with open('./saved_models/'+mfname+'_tokenizer.pkl', 'rb') as handle:
-        tokenizer = pickle.load(handle)
-    tokenizer.oov_token = None #attribute lost during serialization
-    vocab_size = len(tokenizer.word_index.keys())+1
-    print('Vocabulary size after tokenizer:',vocab_size,'unique words.')
-    
-    #load model and perform sanity checks
-    model=load_model('./saved_models/'+mfname+'.hdf5')
-    assert model.input_layers[1].input_shape[1] == max_caption_length
-    assert model.output_layers[0].output_shape[1] == vocab_size
-    #%% plot the image
-    ix=6#6,12,14,18, 72#fail: 54, 73, 74, semi-fail:55, 59, 64, 76
-    target_height = 224
-    target_width = 224
-    img_folder = './Flickr8k_Dataset'
-    f = filenames[ix]
-    img = image.load_img(os.path.join(img_folder,f),
-                             target_size=(target_height,target_width))
-    #img = image.img_to_array(img)
-    #generate the caption
-    caption = generate_caption(images[ix],model=model,tokenizer=tokenizer,
-                               max_caption_length=max_caption_length)
-    plt.imshow(img)#plot the image
-    plt.title(caption)#include the caption as the title
-
-
-
-
-
-
-
-
-
-
-
-
 
