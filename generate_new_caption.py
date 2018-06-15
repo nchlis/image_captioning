@@ -91,15 +91,17 @@ def generate_caption(img, model, tokenizer, max_caption_length):
     return in_text
 
 #%% change these parameters as you see fit
-img_folder = './new_images'#folder containing the images to caption
+img_folder = './captioned_images'#folder containing the images to caption
 save_folder = './captioned_images'#where to save captioned images, make sure to create this folder before running the script
 captioning_model = './saved_models/model128_GRU_dropout0.25.hdf5'#keras model
-captioning_model = './saved_models/model128_GRU_inject_dropout0.0.hdf5'#keras model
+#captioning_model = './saved_models/model128_GRU_inject_dropout0.0.hdf5'#keras model
 #%% read all images in the folder, generate captions and save them
 
 #% load the filenames of all images
 img_filenames = sorted(os.listdir(img_folder))#sort to alphabetical order
 img_filenames = np.array(img_filenames)
+ix_img = ['.txt' not in x for x in img_filenames]#discard the .txt file
+img_filenames = img_filenames[ix_img]
 N = len(img_filenames)#number of total images
 
 #load the tokenizer
