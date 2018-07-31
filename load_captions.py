@@ -78,7 +78,7 @@ for v in captions[example_img]:
     print(v)
 
 #%% save the dictionary using numpy
-#np.save("captions.npy", captions, allow_pickle = True)
+np.save("captions.npy", captions, allow_pickle = True)
 
 #%% sanity check: load saved captions and compare
 captions2 = np.load('captions.npy').item()#.item() necessary for structured array
