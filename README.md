@@ -1,6 +1,10 @@
+Deep learning for image captioning: Should RNNs be blind?
+
+Corresponding blog post: https://nchlis.github.io/2018_07_28/page.html
+
 The usage of each file is the following:
 
-- load_images.py: reads the Flockr8K images, encodes then with a pre-trained ResNet50 and saves them to disk as Flickr8k_images_encoded.npy. The image filenames are saved into Flickr8k_images_filenames.npy.
+- load_images.py: reads the Flickr8K images, encodes then with a pre-trained ResNet50 and saves them to disk as Flickr8k_images_encoded.npy. The image filenames are saved into Flickr8k_images_filenames.npy.
 - load_captions.py: reads the FLickr8K captions and saves then into captions.npy
 - train_model_GRU.py, train_model_LSTM.py: They train a Merge architecture using a GRU and a LSTM, respectively
 - train_model_GRU_inject.py, train_model_LSTM.py: same as above, but using Inject architecture
